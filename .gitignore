@@ -1,0 +1,17 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# EF migrations (keep if you want to track them, remove these lines if so)
+# src/**/Migrations/
+
+# Frontend
+client/node_modules/
+client/dist/
+
+# Env / secrets
+appsettings.*.json
+!appsettings.Development.json

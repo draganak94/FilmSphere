@@ -41,7 +41,7 @@ builder.Services.AddAuthorization();
 // CORS
 builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(p =>
-        p.WithOrigins("http://localhost:3000")
+        p.WithOrigins("http://localhost:5173")
          .AllowAnyHeader()
          .AllowAnyMethod()));
 
@@ -77,6 +77,13 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+    await new FilmSeeder(db).SeedAsync();
+}
 
 app.UseMiddleware<ExceptionMiddleware>();
 

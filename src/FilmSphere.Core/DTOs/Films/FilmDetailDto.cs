@@ -1,6 +1,6 @@
-namespace FilmSphere.Core.Entities;
+namespace FilmSphere.Core.DTOs.Films;
 
-public class Film
+public class FilmDetailDto
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
@@ -12,8 +12,7 @@ public class Film
     public string? Cast { get; set; }
     public string? PosterUrl { get; set; }
     public string? TrailerUrl { get; set; }
-    public string? VideoUrl { get; set; }
     public decimal AverageRating { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public ICollection<Review> Reviews { get; set; } = [];
+    public bool InWatchlist { get; set; }
+    public List<ReviewDto> Reviews { get; set; } = [];
 }

@@ -10,5 +10,7 @@ public class Review
     public int Rating { get; set; }
     public string Content { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    public DateTime? WatchedDate { get; set; }
+    public bool IsFirstWatch { get; set; }
     public ICollection<ReviewLike> Likes { get; set; } = [];
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api/axios';
-import { useAuthStore } from '../store/authStore';
+import LogReviewModal from '../components/LogReviewModal';
 
 interface Review {
   id: number;
@@ -9,6 +9,8 @@ interface Review {
   rating: number;
   content: string;
   createdAt: string;
+  watchedDate?: string;
+  isFirstWatch: boolean;
   likeCount: number;
   likedByMe: boolean;
   isOwnReview: boolean;
@@ -27,6 +29,8 @@ interface FilmDetail {
   trailerUrl?: string;
   averageRating: number;
   inWatchlist: boolean;
+  isLiked: boolean;
+  isWatched: boolean;
   reviews: Review[];
 }
 
@@ -39,21 +43,13 @@ function getYoutubeEmbedUrl(url?: string) {
 export default function FilmPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuthStore();
-
   const [film, setFilm] = useState<FilmDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [reviewText, setReviewText] = useState('');
-  const [reviewRating, setReviewRating] = useState(5);
-  const [submitting, setSubmitting] = useState(false);
-  const [alreadyReviewed, setAlreadyReviewed] = useState(false);
+  const [showLogModal, setShowLogModal] = useState(false);
 
   useEffect(() => {
     api.get<FilmDetail>(`/films/${id}`)
-      .then(res => {
-        setFilm(res.data);
-        setAlreadyReviewed(res.data.reviews.some(r => r.displayName === user?.displayName));
-      })
+      .then(res => setFilm(res.data))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -73,18 +69,9 @@ export default function FilmPage() {
     } : f);
   };
 
-  const submitReview = async () => {
-    if (!film || !reviewText.trim()) return;
-    setSubmitting(true);
-    try {
-      await api.post(`/films/${film.id}/reviews`, { rating: reviewRating, content: reviewText });
-      const res = await api.get<FilmDetail>(`/films/${film.id}`);
-      setFilm(res.data);
-      setAlreadyReviewed(true);
-      setReviewText('');
-    } finally {
-      setSubmitting(false);
-    }
+  const refreshFilm = async () => {
+    const res = await api.get<FilmDetail>(`/films/${id}`);
+    setFilm(res.data);
   };
 
   if (loading) return <div style={{ padding: 'var(--space-8)', color: 'var(--text-muted)' }}>Loading...</div>;
@@ -93,6 +80,7 @@ export default function FilmPage() {
   const embedUrl = getYoutubeEmbedUrl(film.trailerUrl);
 
   return (
+    <>
     <div style={{ minHeight: '100vh', padding: 'var(--space-8) var(--space-6)' }}>
       <div className="container" style={{ maxWidth: 960 }}>
 
@@ -133,12 +121,32 @@ export default function FilmPage() {
                 <strong style={{ color: 'var(--text-secondary)' }}>Cast:</strong> {film.cast}
               </p>
             )}
-            <button
-              className={film.inWatchlist ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'}
-              onClick={toggleWatchlist}
-            >
-              {film.inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
-            </button>
+            <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+              {!film.isWatched && (
+                <button
+                  className={film.inWatchlist ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'}
+                  onClick={toggleWatchlist}
+                >
+                  {film.inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
+                </button>
+              )}
+              {!film.isWatched ? (
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setShowLogModal(true)}
+                >
+                  Review or log
+                </button>
+              ) : (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
+                  fontSize: 'var(--font-size-sm)', color: 'var(--text-muted)',
+                  padding: '0 var(--space-2)',
+                }}>
+                  ✓ Watched
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -162,38 +170,6 @@ export default function FilmPage() {
           <h2 style={{ fontSize: 'var(--font-size-xl)', marginBottom: 'var(--space-6)' }}>
             Reviews {film.reviews.length > 0 && <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({film.reviews.length})</span>}
           </h2>
-
-          {!alreadyReviewed && (
-            <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
-              <h3 style={{ marginBottom: 'var(--space-4)', fontSize: 'var(--font-size-md)' }}>Write a review</h3>
-              <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', alignItems: 'center' }}>
-                <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>Rating:</span>
-                {[1, 2, 3, 4, 5].map(n => (
-                  <button
-                    key={n}
-                    onClick={() => setReviewRating(n)}
-                    style={{
-                      fontSize: 'var(--font-size-xl)',
-                      color: n <= reviewRating ? 'var(--color-primary)' : 'var(--text-muted)',
-                      transition: 'color var(--transition-fast)',
-                    }}
-                  >
-                    ★
-                  </button>
-                ))}
-              </div>
-              <textarea
-                rows={3}
-                placeholder="Share your thoughts..."
-                value={reviewText}
-                onChange={e => setReviewText(e.target.value)}
-                style={{ marginBottom: 'var(--space-4)', resize: 'vertical' }}
-              />
-              <button className="btn btn-primary btn-sm" onClick={submitReview} disabled={submitting}>
-                {submitting ? 'Submitting...' : 'Submit Review'}
-              </button>
-            </div>
-          )}
 
           {film.reviews.length === 0 ? (
             <p style={{ color: 'var(--text-muted)' }}>No reviews yet. Be the first!</p>
@@ -244,5 +220,18 @@ export default function FilmPage() {
 
       </div>
     </div>
+
+    {showLogModal && film && (
+      <LogReviewModal
+        film={{ id: film.id, title: film.title, posterUrl: film.posterUrl }}
+        initialIsLiked={film.isLiked}
+        onClose={() => setShowLogModal(false)}
+        onSaved={async () => {
+          setShowLogModal(false);
+          await refreshFilm();
+        }}
+      />
+    )}
+    </>
   );
 }

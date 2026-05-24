@@ -14,5 +14,7 @@ public class FilmDetailDto
     public string? TrailerUrl { get; set; }
     public decimal AverageRating { get; set; }
     public bool InWatchlist { get; set; }
+    public bool IsLiked { get; set; }
+    public bool IsWatched { get; set; }
     public List<ReviewDto> Reviews { get; set; } = [];
 }

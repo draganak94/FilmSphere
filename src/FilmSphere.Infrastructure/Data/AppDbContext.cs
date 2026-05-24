@@ -12,8 +12,10 @@ public class AppDbContext : DbContext
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<ReviewLike> ReviewLikes => Set<ReviewLike>();
     public DbSet<WatchlistItem> WatchlistItems => Set<WatchlistItem>();
+    public DbSet<FilmLike> FilmLikes => Set<FilmLike>();
     public DbSet<FriendRequest> FriendRequests => Set<FriendRequest>();
     public DbSet<Message> Messages => Set<Message>();
+    public DbSet<UserFavorite> UserFavorites => Set<UserFavorite>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,6 +41,11 @@ public class AppDbContext : DbContext
             e.HasIndex(w => new { w.UserId, w.FilmId }).IsUnique();
         });
 
+        modelBuilder.Entity<FilmLike>(e =>
+        {
+            e.HasKey(l => new { l.FilmId, l.UserId });
+        });
+
         modelBuilder.Entity<Message>(e =>
         {
             e.HasOne(m => m.Sender)
@@ -51,6 +58,11 @@ public class AppDbContext : DbContext
              .OnDelete(DeleteBehavior.Restrict);
             e.HasIndex(m => new { m.SenderId, m.ReceiverId });
             e.HasIndex(m => m.ReceiverId);
+        });
+
+        modelBuilder.Entity<UserFavorite>(e =>
+        {
+            e.HasKey(f => new { f.UserId, f.FilmId });
         });
 
         modelBuilder.Entity<FriendRequest>(e =>

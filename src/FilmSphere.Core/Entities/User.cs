@@ -9,4 +9,5 @@ public class User
     public string DisplayName { get; set; } = string.Empty;
     public bool IsSubscribed { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? AvatarUrl { get; set; }
 }

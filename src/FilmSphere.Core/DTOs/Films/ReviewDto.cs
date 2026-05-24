@@ -7,6 +7,8 @@ public class ReviewDto
     public int Rating { get; set; }
     public string Content { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    public DateTime? WatchedDate { get; set; }
+    public bool IsFirstWatch { get; set; }
     public int LikeCount { get; set; }
     public bool LikedByMe { get; set; }
     public bool IsOwnReview { get; set; }

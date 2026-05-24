@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuthStore } from '../store/authStore';
+import NavBar from '../components/NavBar';
 
 type Tab = 'my-friends' | 'add-friends';
 
@@ -30,7 +31,7 @@ interface SearchResult {
 }
 
 export default function FriendsPage() {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const [tab, setTab] = useState<Tab>('my-friends');
 
   const [friends, setFriends] = useState<Friend[]>([]);
@@ -132,14 +133,8 @@ export default function FriendsPage() {
   return (
     <div style={{ minHeight: '100vh', padding: 'var(--space-8) var(--space-6)' }}>
       <div className="container">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-8)' }}>
-          <h1 className="gradient-text" style={{ fontSize: 'var(--font-size-2xl)' }}>Friends</h1>
-          <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-            <Link to="/" className="btn btn-ghost btn-sm">Home</Link>
-            <Link to="/watchlist" className="btn btn-ghost btn-sm">My Watchlist</Link>
-            <button className="btn btn-ghost btn-sm" onClick={logout}>Sign out</button>
-          </div>
-        </div>
+        <NavBar />
+        <h1 className="gradient-text" style={{ fontSize: 'var(--font-size-2xl)', marginBottom: 'var(--space-6)' }}>Friends</h1>
 
         <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: 'var(--space-6)' }}>
           <button style={tabStyle(tab === 'my-friends')} onClick={() => setTab('my-friends')}>
@@ -174,10 +169,10 @@ export default function FriendsPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                       {pending.map(req => (
                         <div key={req.id} className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--space-4)' }}>
-                          <div>
+                          <Link to={`/users/${req.username}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                             <span style={{ fontWeight: 600 }}>{req.displayName}</span>
                             <span style={{ color: 'var(--text-secondary)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>@{req.username}</span>
-                          </div>
+                          </Link>
                           <button
                             className="btn btn-primary btn-sm"
                             onClick={() => acceptRequest(req.id, req.username)}
@@ -206,10 +201,10 @@ export default function FriendsPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                     {friends.map(f => (
                       <div key={f.userId} className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--space-4)' }}>
-                        <div>
+                        <Link to={`/users/${f.username}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                           <span style={{ fontWeight: 600 }}>{f.displayName}</span>
                           <span style={{ color: 'var(--text-secondary)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>@{f.username}</span>
-                        </div>
+                        </Link>
                         <button
                           className="btn btn-primary btn-sm"
                           onClick={() => removeFriend(f.userId)}
@@ -247,10 +242,10 @@ export default function FriendsPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {searchResults.map(r => (
                   <div key={r.userId} className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--space-4)' }}>
-                    <div>
+                    <Link to={`/users/${r.username}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                       <span style={{ fontWeight: 600 }}>{r.displayName}</span>
                       <span style={{ color: 'var(--text-secondary)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>@{r.username}</span>
-                    </div>
+                    </Link>
                     <RelationButton
                       relation={r.relation}
                       loading={actionLoading === r.username}

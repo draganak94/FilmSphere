@@ -12,6 +12,8 @@ public class AppDbContext : DbContext
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<ReviewLike> ReviewLikes => Set<ReviewLike>();
     public DbSet<WatchlistItem> WatchlistItems => Set<WatchlistItem>();
+    public DbSet<FriendRequest> FriendRequests => Set<FriendRequest>();
+    public DbSet<Message> Messages => Set<Message>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,6 +37,34 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<WatchlistItem>(e =>
         {
             e.HasIndex(w => new { w.UserId, w.FilmId }).IsUnique();
+        });
+
+        modelBuilder.Entity<Message>(e =>
+        {
+            e.HasOne(m => m.Sender)
+             .WithMany()
+             .HasForeignKey(m => m.SenderId)
+             .OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(m => m.Receiver)
+             .WithMany()
+             .HasForeignKey(m => m.ReceiverId)
+             .OnDelete(DeleteBehavior.Restrict);
+            e.HasIndex(m => new { m.SenderId, m.ReceiverId });
+            e.HasIndex(m => m.ReceiverId);
+        });
+
+        modelBuilder.Entity<FriendRequest>(e =>
+        {
+            e.HasIndex(r => new { r.SenderId, r.ReceiverId }).IsUnique();
+            e.Property(r => r.Status).HasConversion<string>();
+            e.HasOne(r => r.Sender)
+             .WithMany()
+             .HasForeignKey(r => r.SenderId)
+             .OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(r => r.Receiver)
+             .WithMany()
+             .HasForeignKey(r => r.ReceiverId)
+             .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

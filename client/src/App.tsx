@@ -1,6 +1,8 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import ChatWidget from './components/ChatWidget';
 import PrivateRoute from './components/PrivateRoute';
 import FilmPage from './pages/FilmPage';
+import FriendsPage from './pages/FriendsPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -16,8 +18,10 @@ export default function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/films/:id" element={<FilmPage />} />
           <Route path="/watchlist" element={<WatchlistPage />} />
+          <Route path="/friends" element={<FriendsPage />} />
         </Route>
       </Routes>
+      <ChatWidget />
     </BrowserRouter>
   );
 }

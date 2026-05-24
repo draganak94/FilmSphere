@@ -1,3 +1,4 @@
+using FilmSphere.API.Hubs;
 using FilmSphere.API.Middleware;
 using FilmSphere.Core.Interfaces;
 using FilmSphere.Infrastructure.Data;
@@ -17,6 +18,8 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IFriendService, FriendService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 
 // JWT authentication
 var jwt = builder.Configuration.GetSection("Jwt");
@@ -34,16 +37,32 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwt["Key"]!))
         };
+        // SignalR sends token via query string (WebSockets can't set headers)
+        opt.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                    context.Token = accessToken;
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Services.AddAuthorization();
 
-// CORS
+// SignalR
+builder.Services.AddSignalR();
+
+// CORS — AllowCredentials required for SignalR
 builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(p =>
         p.WithOrigins("http://localhost:5173")
          .AllowAnyHeader()
-         .AllowAnyMethod()));
+         .AllowAnyMethod()
+         .AllowCredentials()));
 
 // Controllers + Swagger
 builder.Services.AddControllers();
@@ -97,5 +116,6 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.Run();

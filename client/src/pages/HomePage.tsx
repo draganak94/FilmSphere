@@ -65,6 +65,7 @@ export default function HomePage() {
             Welcome, {user.displayName}!
           </h1>
           <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+            <Link to="/friends" className="btn btn-ghost btn-sm">Friends</Link>
             <Link to="/watchlist" className="btn btn-ghost btn-sm">My Watchlist</Link>
             <button className="btn btn-ghost btn-sm" onClick={logout}>Sign out</button>
           </div>

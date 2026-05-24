@@ -26,7 +26,7 @@ public class AuthService : IAuthService
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
         if (await _db.Users.AnyAsync(u => u.Username == request.Username))
-            throw new AppException("Username already taken");
+            throw new AppException("Username already in use");
 
         if (await _db.Users.AnyAsync(u => u.Email == request.Email))
             throw new AppException("Email already registered");

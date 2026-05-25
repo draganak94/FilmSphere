@@ -4,6 +4,10 @@ import api from '../api/axios';
 import NavBar from '../components/NavBar';
 import FilmCard, { Film } from '../components/FilmCard';
 
+const API_ORIGIN = new URL(api.defaults.baseURL!).origin;
+const resolveUrl = (url?: string) =>
+  url?.startsWith('/') ? `${API_ORIGIN}${url}` : url;
+
 interface FavoriteFilm {
   filmId: number;
   title: string;
@@ -131,7 +135,7 @@ export default function UserProfilePage() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-8)' }}>
           {profile.avatarUrl ? (
             <img
-              src={profile.avatarUrl}
+              src={resolveUrl(profile.avatarUrl)}
               alt={profile.displayName}
               style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--border-color)' }}
             />

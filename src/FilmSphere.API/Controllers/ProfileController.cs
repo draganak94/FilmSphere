@@ -175,6 +175,46 @@ public class ProfileController(AppDbContext db) : ControllerBase
         return Ok();
     }
 
+    [HttpPost("avatar/upload")]
+    public async Task<IActionResult> UploadAvatar(IFormFile file)
+    {
+        if (file is null || file.Length == 0)
+            return BadRequest("No file provided.");
+
+        var allowed = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!allowed.Contains(ext))
+            return BadRequest("Only image files are allowed.");
+
+        if (file.Length > 5 * 1024 * 1024)
+            return BadRequest("File size must be under 5 MB.");
+
+        var userId = UserId;
+        var avatarsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "avatars");
+        Directory.CreateDirectory(avatarsDir);
+
+        // Remove old avatar file if it was previously uploaded
+        var user = await db.Users.FindAsync(userId);
+        if (user?.AvatarUrl?.StartsWith("/avatars/") == true)
+        {
+            var oldFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.AvatarUrl.TrimStart('/'));
+            if (System.IO.File.Exists(oldFile))
+                System.IO.File.Delete(oldFile);
+        }
+
+        var fileName = $"{userId}{ext}";
+        var filePath = Path.Combine(avatarsDir, fileName);
+        await using var stream = new FileStream(filePath, FileMode.Create);
+        await file.CopyToAsync(stream);
+
+        var avatarUrl = $"/avatars/{fileName}";
+        await db.Users
+            .Where(u => u.Id == userId)
+            .ExecuteUpdateAsync(s => s.SetProperty(u => u.AvatarUrl, avatarUrl));
+
+        return Ok(new { avatarUrl });
+    }
+
     [HttpPut("favorites")]
     public async Task<IActionResult> UpdateFavorites([FromBody] UpdateFavoritesRequest request)
     {

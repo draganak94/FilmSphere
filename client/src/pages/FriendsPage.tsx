@@ -4,12 +4,37 @@ import api from '../api/axios';
 import { useAuthStore } from '../store/authStore';
 import NavBar from '../components/NavBar';
 
+const API_ORIGIN = new URL(api.defaults.baseURL!).origin;
+const resolveUrl = (url?: string) =>
+  url?.startsWith('/') ? `${API_ORIGIN}${url}` : url;
+
+function UserAvatar({ avatarUrl, displayName, size = 36 }: { avatarUrl?: string; displayName: string; size?: number }) {
+  const initials = displayName.slice(0, 2).toUpperCase();
+  return avatarUrl ? (
+    <img
+      src={resolveUrl(avatarUrl)}
+      alt={displayName}
+      style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+    />
+  ) : (
+    <div style={{
+      width: size, height: size, borderRadius: '50%', flexShrink: 0,
+      background: 'var(--color-primary)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: size * 0.36, fontWeight: 700, color: '#fff',
+    }}>
+      {initials}
+    </div>
+  );
+}
+
 type Tab = 'my-friends' | 'add-friends';
 
 interface Friend {
   userId: string;
   username: string;
   displayName: string;
+  avatarUrl?: string;
   friendsSince: string;
 }
 
@@ -17,6 +42,7 @@ interface PendingRequest {
   id: string;
   username: string;
   displayName: string;
+  avatarUrl?: string;
   createdAt: string;
 }
 
@@ -26,6 +52,7 @@ interface SearchResult {
   userId: string;
   username: string;
   displayName: string;
+  avatarUrl?: string;
   relation: Relation;
   requestId: string | null;
 }
@@ -169,9 +196,12 @@ export default function FriendsPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                       {pending.map(req => (
                         <div key={req.id} className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--space-4)' }}>
-                          <Link to={`/users/${req.username}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <span style={{ fontWeight: 600 }}>{req.displayName}</span>
-                            <span style={{ color: 'var(--text-secondary)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>@{req.username}</span>
+                          <Link to={`/users/${req.username}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                            <UserAvatar avatarUrl={req.avatarUrl} displayName={req.displayName} />
+                            <span>
+                              <span style={{ fontWeight: 600 }}>{req.displayName}</span>
+                              <span style={{ color: 'var(--text-secondary)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>@{req.username}</span>
+                            </span>
                           </Link>
                           <button
                             className="btn btn-primary btn-sm"
@@ -201,9 +231,12 @@ export default function FriendsPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                     {friends.map(f => (
                       <div key={f.userId} className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--space-4)' }}>
-                        <Link to={`/users/${f.username}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                          <span style={{ fontWeight: 600 }}>{f.displayName}</span>
-                          <span style={{ color: 'var(--text-secondary)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>@{f.username}</span>
+                        <Link to={`/users/${f.username}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                          <UserAvatar avatarUrl={f.avatarUrl} displayName={f.displayName} />
+                          <span>
+                            <span style={{ fontWeight: 600 }}>{f.displayName}</span>
+                            <span style={{ color: 'var(--text-secondary)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>@{f.username}</span>
+                          </span>
                         </Link>
                         <button
                           className="btn btn-primary btn-sm"
@@ -242,9 +275,12 @@ export default function FriendsPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {searchResults.map(r => (
                   <div key={r.userId} className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--space-4)' }}>
-                    <Link to={`/users/${r.username}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                      <span style={{ fontWeight: 600 }}>{r.displayName}</span>
-                      <span style={{ color: 'var(--text-secondary)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>@{r.username}</span>
+                    <Link to={`/users/${r.username}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                      <UserAvatar avatarUrl={r.avatarUrl} displayName={r.displayName} />
+                      <span>
+                        <span style={{ fontWeight: 600 }}>{r.displayName}</span>
+                        <span style={{ color: 'var(--text-secondary)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>@{r.username}</span>
+                      </span>
                     </Link>
                     <RelationButton
                       relation={r.relation}

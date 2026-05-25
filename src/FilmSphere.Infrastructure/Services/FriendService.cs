@@ -90,6 +90,7 @@ public class FriendService : IFriendService
                 UserId = friend.Id,
                 Username = friend.Username,
                 DisplayName = friend.DisplayName,
+                AvatarUrl = friend.AvatarUrl,
                 FriendsSince = r.CreatedAt
             };
         }).ToList();
@@ -106,6 +107,7 @@ public class FriendService : IFriendService
                 Id = r.Id,
                 Username = r.Sender.Username,
                 DisplayName = r.Sender.DisplayName,
+                AvatarUrl = r.Sender.AvatarUrl,
                 CreatedAt = r.CreatedAt
             })
             .ToListAsync();
@@ -153,6 +155,7 @@ public class FriendService : IFriendService
                 UserId = u.Id,
                 Username = u.Username,
                 DisplayName = u.DisplayName,
+                AvatarUrl = u.AvatarUrl,
                 Relation = relation,
                 RequestId = requestId
             };

@@ -4,6 +4,10 @@ import api from '../api/axios';
 import NavBar from '../components/NavBar';
 import { Film } from '../components/FilmCard';
 
+const API_ORIGIN = new URL(api.defaults.baseURL!).origin;
+const resolveUrl = (url?: string) =>
+  url?.startsWith('/') ? `${API_ORIGIN}${url}` : url;
+
 interface FavoriteFilm {
   filmId: number;
   title: string;
@@ -22,8 +26,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [editingAvatar, setEditingAvatar] = useState(false);
-  const [avatarInput, setAvatarInput] = useState('');
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerSlot, setPickerSlot] = useState<number>(1);
   const [watchedFilms, setWatchedFilms] = useState<Film[]>([]);
@@ -72,11 +75,21 @@ export default function ProfilePage() {
     setProfile(prev => prev ? { ...prev, favorites: updated } : prev);
   };
 
-  const saveAvatar = async () => {
-    const url = avatarInput.trim() || null;
-    await api.put('/profile/avatar', { avatarUrl: url });
-    setProfile(prev => prev ? { ...prev, avatarUrl: url ?? undefined } : prev);
-    setEditingAvatar(false);
+  const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarUploading(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await api.post<{ avatarUrl: string }>('/profile/avatar/upload', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setProfile(prev => prev ? { ...prev, avatarUrl: `${res.data.avatarUrl}?t=${Date.now()}` } : prev);
+    } finally {
+      setAvatarUploading(false);
+      e.target.value = '';
+    }
   };
 
   if (loading) return <div style={{ padding: 'var(--space-8)', color: 'var(--text-muted)' }}>Loading...</div>;
@@ -99,12 +112,23 @@ export default function ProfilePage() {
 
         {/* Avatar + name */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-8)' }}>
-          <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => { setEditingAvatar(v => !v); setAvatarInput(profile.avatarUrl ?? ''); }}>
+          <label style={{ position: 'relative', cursor: avatarUploading ? 'wait' : 'pointer' }}>
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleAvatarFile}
+              disabled={avatarUploading}
+            />
             {profile.avatarUrl ? (
               <img
-                src={profile.avatarUrl}
+                src={resolveUrl(profile.avatarUrl)}
                 alt={profile.displayName}
-                style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--border-color)' }}
+                style={{
+                  width: 100, height: 100, borderRadius: '50%', objectFit: 'cover',
+                  border: '3px solid var(--border-color)',
+                  opacity: avatarUploading ? 0.5 : 1,
+                }}
               />
             ) : (
               <div style={{
@@ -113,8 +137,9 @@ export default function ProfilePage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 'var(--font-size-xl)', fontWeight: 700, color: '#fff',
                 border: '3px solid var(--border-color)',
+                opacity: avatarUploading ? 0.5 : 1,
               }}>
-                {initials}
+                {avatarUploading ? '...' : initials}
               </div>
             )}
             <div style={{
@@ -123,24 +148,7 @@ export default function ProfilePage() {
               width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 13, border: '2px solid var(--border-color)',
             }}>✎</div>
-          </div>
-
-          {editingAvatar && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', width: 260 }}>
-              <input
-                type="url"
-                placeholder="Paste image URL..."
-                value={avatarInput}
-                onChange={e => setAvatarInput(e.target.value)}
-                style={{ fontSize: 'var(--font-size-xs)' }}
-                autoFocus
-              />
-              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                <button className="btn btn-primary btn-sm" style={{ flex: 1 }} onClick={saveAvatar}>Save</button>
-                <button className="btn btn-ghost btn-sm" style={{ flex: 1 }} onClick={() => setEditingAvatar(false)}>Cancel</button>
-              </div>
-            </div>
-          )}
+          </label>
 
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontWeight: 700, fontSize: 'var(--font-size-xl)' }}>{profile.displayName}</div>

@@ -2,6 +2,7 @@ namespace FilmSphere.Core.DTOs.Films;
 
 public class DiaryEntryDto
 {
+    public int ReviewId { get; set; }
     public int FilmId { get; set; }
     public string Title { get; set; } = string.Empty;
     public int Year { get; set; }

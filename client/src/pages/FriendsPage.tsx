@@ -21,7 +21,7 @@ function UserAvatar({ avatarUrl, displayName, size = 36 }: { avatarUrl?: string;
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
       background: 'var(--color-primary)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size * 0.36, fontWeight: 700, color: '#fff',
+      fontSize: size * 0.36, fontWeight: 700, color: '#472552',
     }}>
       {initials}
     </div>
@@ -149,8 +149,8 @@ export default function FriendsPage() {
     padding: 'var(--space-2) var(--space-6)',
     background: 'none',
     border: 'none',
-    borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent',
-    color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+    borderBottom: active ? '2px solid var(--color-primary)' : '2px solid transparent',
+    color: active ? 'var(--color-primary)' : 'var(--text-secondary)',
     cursor: 'pointer',
     fontSize: 'var(--font-size-base)',
     fontWeight: active ? 600 : 400,
@@ -190,7 +190,7 @@ export default function FriendsPage() {
               <>
                 {pending.length > 0 && (
                   <div style={{ marginBottom: 'var(--space-8)' }}>
-                    <h3 style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-4)' }}>
+                    <h3 style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-4)' }}>
                       Pending requests ({pending.length})
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
@@ -199,7 +199,7 @@ export default function FriendsPage() {
                           <Link to={`/users/${req.username}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                             <UserAvatar avatarUrl={req.avatarUrl} displayName={req.displayName} />
                             <span>
-                              <span style={{ fontWeight: 600 }}>{req.displayName}</span>
+                              <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{req.displayName}</span>
                               <span style={{ color: 'var(--text-secondary)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>@{req.username}</span>
                             </span>
                           </Link>
@@ -216,7 +216,7 @@ export default function FriendsPage() {
                   </div>
                 )}
 
-                <h3 style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-4)' }}>
+                <h3 style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-4)' }}>
                   Friends ({friends.length})
                 </h3>
                 {friends.length === 0 ? (
@@ -234,7 +234,7 @@ export default function FriendsPage() {
                         <Link to={`/users/${f.username}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                           <UserAvatar avatarUrl={f.avatarUrl} displayName={f.displayName} />
                           <span>
-                            <span style={{ fontWeight: 600 }}>{f.displayName}</span>
+                            <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{f.displayName}</span>
                             <span style={{ color: 'var(--text-secondary)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>@{f.username}</span>
                           </span>
                         </Link>
@@ -278,7 +278,7 @@ export default function FriendsPage() {
                     <Link to={`/users/${r.username}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                       <UserAvatar avatarUrl={r.avatarUrl} displayName={r.displayName} />
                       <span>
-                        <span style={{ fontWeight: 600 }}>{r.displayName}</span>
+                        <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{r.displayName}</span>
                         <span style={{ color: 'var(--text-secondary)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>@{r.username}</span>
                       </span>
                     </Link>

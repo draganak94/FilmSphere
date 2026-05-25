@@ -46,6 +46,7 @@ export default function FilmPage() {
   const [film, setFilm] = useState<FilmDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLogModal, setShowLogModal] = useState(false);
+  const [editingReview, setEditingReview] = useState<Review | null>(null);
 
   useEffect(() => {
     api.get<FilmDetail>(`/films/${id}`)
@@ -140,7 +141,7 @@ export default function FilmPage() {
               ) : (
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
-                  fontSize: 'var(--font-size-sm)', color: 'var(--text-muted)',
+                  fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)',
                   padding: '0 var(--space-2)',
                 }}>
                   ✓ Watched
@@ -153,7 +154,7 @@ export default function FilmPage() {
         {/* Trailer */}
         {embedUrl && (
           <div style={{ marginBottom: 'var(--space-8)' }}>
-            <h2 style={{ fontSize: 'var(--font-size-xl)', marginBottom: 'var(--space-4)' }}>Trailer</h2>
+            <h2 style={{ fontSize: 'var(--font-size-xl)', marginBottom: 'var(--space-4)', color: 'var(--color-primary)' }}>Trailer</h2>
             <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
               <iframe
                 src={embedUrl}
@@ -167,8 +168,8 @@ export default function FilmPage() {
 
         {/* Reviews */}
         <div>
-          <h2 style={{ fontSize: 'var(--font-size-xl)', marginBottom: 'var(--space-6)' }}>
-            Reviews {film.reviews.length > 0 && <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({film.reviews.length})</span>}
+          <h2 style={{ fontSize: 'var(--font-size-xl)', marginBottom: 'var(--space-6)', color: 'var(--color-primary)' }}>
+            Reviews {film.reviews.length > 0 && <span style={{ color: 'var(--color-primary)', fontWeight: 400 }}>({film.reviews.length})</span>}
           </h2>
 
           {film.reviews.length === 0 ? (
@@ -179,7 +180,7 @@ export default function FilmPage() {
                 <div key={r.id} className="card" style={{ padding: 'var(--space-4)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-2)' }}>
                     <div>
-                      <span style={{ fontWeight: 700 }}>{r.displayName}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--color-primary)' }}>{r.displayName}</span>
                       <span style={{ color: 'var(--color-primary)', marginLeft: 'var(--space-2)' }}>
                         {'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}
                       </span>
@@ -188,16 +189,31 @@ export default function FilmPage() {
                       {new Date(r.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                  <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-3)' }}>{r.content}</p>
+                  <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-3)', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{r.content}</p>
                   {r.isOwnReview ? (
-                    <span style={{
-                      fontSize: 'var(--font-size-xl)',
-                      color: r.likeCount > 0 ? 'var(--color-primary)' : 'var(--text-muted)',
-                      textShadow: r.likeCount > 0 ? 'var(--shadow-glow-primary)' : 'none',
-                      display: 'flex', alignItems: 'center', gap: 'var(--space-1)',
-                    }}>
-                      ♥ {r.likeCount > 0 && <span style={{ fontSize: 'var(--font-size-sm)' }}>{r.likeCount}</span>}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                      <span style={{
+                        fontSize: 'var(--font-size-xl)',
+                        color: r.likeCount > 0 ? 'var(--color-primary)' : 'var(--text-muted)',
+                        textShadow: r.likeCount > 0 ? 'var(--shadow-glow-primary)' : 'none',
+                        display: 'flex', alignItems: 'center', gap: 'var(--space-1)',
+                      }}>
+                        ♥ {r.likeCount > 0 && <span style={{ fontSize: 'var(--font-size-sm)' }}>{r.likeCount}</span>}
+                      </span>
+                      <button
+                        onClick={() => setEditingReview(r)}
+                        style={{
+                          fontSize: 'var(--font-size-sm)',
+                          color: 'var(--text-muted)',
+                          padding: '2px var(--space-2)',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: 'var(--radius-sm)',
+                          transition: 'color var(--transition-fast), border-color var(--transition-fast)',
+                        }}
+                      >
+                        ✎ Edit
+                      </button>
+                    </div>
                   ) : (
                     <button
                       onClick={() => toggleLike(r.id)}
@@ -228,6 +244,25 @@ export default function FilmPage() {
         onClose={() => setShowLogModal(false)}
         onSaved={async () => {
           setShowLogModal(false);
+          await refreshFilm();
+        }}
+      />
+    )}
+
+    {editingReview && film && (
+      <LogReviewModal
+        film={{ id: film.id, title: film.title, posterUrl: film.posterUrl }}
+        initialIsLiked={film.isLiked}
+        editReview={{
+          id: editingReview.id,
+          rating: editingReview.rating,
+          content: editingReview.content,
+          watchedDate: editingReview.watchedDate,
+          isFirstWatch: editingReview.isFirstWatch,
+        }}
+        onClose={() => setEditingReview(null)}
+        onSaved={async () => {
+          setEditingReview(null);
           await refreshFilm();
         }}
       />

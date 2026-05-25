@@ -120,6 +120,26 @@ public class FilmsController(AppDbContext db) : ControllerBase
         return Ok(new { review.Id });
     }
 
+    [HttpPut("reviews/{reviewId}")]
+    public async Task<IActionResult> UpdateReview(int reviewId, CreateReviewRequest request)
+    {
+        var userId = UserId;
+
+        var review = await db.Reviews.FindAsync(reviewId);
+        if (review is null) return NotFound();
+        if (review.UserId != userId) return Forbid();
+
+        review.Rating = Math.Clamp(request.Rating, 1, 5);
+        review.Content = request.Content;
+        review.WatchedDate = request.WatchedDate;
+        review.IsFirstWatch = request.IsFirstWatch;
+
+        await db.SaveChangesAsync();
+        await UpdateAverageRating(review.FilmId);
+
+        return Ok(new { review.Id });
+    }
+
     [HttpPost("reviews/{reviewId}/like")]
     public async Task<IActionResult> ToggleLike(int reviewId)
     {
@@ -194,6 +214,7 @@ public class FilmsController(AppDbContext db) : ControllerBase
             .Where(r => r.FilmId == id && r.UserId == userId)
             .Select(r => new DiaryEntryDto
             {
+                ReviewId = r.Id,
                 FilmId = r.FilmId,
                 Title = r.Film.Title,
                 Year = r.Film.Year,
@@ -220,6 +241,7 @@ public class FilmsController(AppDbContext db) : ControllerBase
             .OrderByDescending(r => r.WatchedDate ?? r.CreatedAt)
             .Select(r => new DiaryEntryDto
             {
+                ReviewId = r.Id,
                 FilmId = r.FilmId,
                 Title = r.Film.Title,
                 Year = r.Film.Year,

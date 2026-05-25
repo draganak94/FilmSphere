@@ -6,16 +6,27 @@ interface Props {
   initialIsLiked: boolean;
   onClose: () => void;
   onSaved: (isLiked: boolean) => void;
+  editReview?: {
+    id: number;
+    rating: number;
+    content: string;
+    watchedDate?: string;
+    isFirstWatch: boolean;
+  };
 }
 
-export default function LogReviewModal({ film, initialIsLiked, onClose, onSaved }: Props) {
+export default function LogReviewModal({ film, initialIsLiked, onClose, onSaved, editReview }: Props) {
   const today = new Date().toISOString().split('T')[0];
-  const [watchedDate, setWatchedDate] = useState(today);
-  const [rating, setRating] = useState(0);
+  const initialDate = editReview?.watchedDate
+    ? new Date(editReview.watchedDate).toISOString().split('T')[0]
+    : today;
+
+  const [watchedDate, setWatchedDate] = useState(initialDate);
+  const [rating, setRating] = useState(editReview?.rating ?? 0);
   const [hoverRating, setHoverRating] = useState(0);
   const [isLiked, setIsLiked] = useState(initialIsLiked);
-  const [review, setReview] = useState('');
-  const [isFirstWatch, setIsFirstWatch] = useState(true);
+  const [review, setReview] = useState(editReview?.content ?? '');
+  const [isFirstWatch, setIsFirstWatch] = useState(editReview?.isFirstWatch ?? true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -26,15 +37,28 @@ export default function LogReviewModal({ film, initialIsLiked, onClose, onSaved 
     setSubmitting(true);
     setError('');
     try {
-      await api.post(`/films/${film.id}/reviews`, {
-        rating,
-        content: review,
-        watchedDate: new Date(watchedDate).toISOString(),
-        isFirstWatch,
-      });
+      if (editReview) {
+        await api.put(`/films/reviews/${editReview.id}`, {
+          rating,
+          content: review,
+          watchedDate: new Date(watchedDate).toISOString(),
+          isFirstWatch,
+        });
 
-      if (isLiked !== initialIsLiked) {
-        await api.post(`/films/${film.id}/like`);
+        if (isLiked !== initialIsLiked) {
+          await api.post(`/films/${film.id}/like`);
+        }
+      } else {
+        await api.post(`/films/${film.id}/reviews`, {
+          rating,
+          content: review,
+          watchedDate: new Date(watchedDate).toISOString(),
+          isFirstWatch,
+        });
+
+        if (isLiked !== initialIsLiked) {
+          await api.post(`/films/${film.id}/like`);
+        }
       }
 
       onSaved(isLiked);
@@ -73,10 +97,12 @@ export default function LogReviewModal({ film, initialIsLiked, onClose, onSaved 
             />
           )}
           <div>
-            <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 700, marginBottom: 'var(--space-1)' }}>
+            <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 700, marginBottom: 'var(--space-1)', color: 'var(--color-primary)' }}>
               {film.title}
             </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)' }}>Review or log</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)' }}>
+              {editReview ? 'Edit review' : 'Review or log'}
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -177,7 +203,7 @@ export default function LogReviewModal({ film, initialIsLiked, onClose, onSaved 
             onClick={handleSubmit}
             disabled={!canSubmit || submitting}
           >
-            {submitting ? 'Saving...' : 'Save'}
+            {submitting ? 'Saving...' : editReview ? 'Update' : 'Save'}
           </button>
         </div>
       </div>

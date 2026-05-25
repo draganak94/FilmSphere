@@ -113,7 +113,7 @@ export default function UserProfilePage() {
     textAlign: 'center' as const,
     width: '100%',
     background: active ? 'var(--color-primary)' : undefined,
-    color: active ? '#fff' : undefined,
+    color: active ? '#472552' : undefined,
   });
 
   const filmGrid = (films: Film[]) => (
@@ -144,15 +144,15 @@ export default function UserProfilePage() {
               width: 100, height: 100, borderRadius: '50%',
               background: 'var(--color-primary)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 'var(--font-size-xl)', fontWeight: 700, color: '#fff',
+              fontSize: 'var(--font-size-xl)', fontWeight: 700, color: '#472552',
               border: '3px solid var(--border-color)',
             }}>
               {initials}
             </div>
           )}
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontWeight: 700, fontSize: 'var(--font-size-xl)' }}>{profile.displayName}</div>
-            <div style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)' }}>@{profile.username}</div>
+            <div style={{ fontWeight: 700, fontSize: 'var(--font-size-xl)', color: 'var(--color-primary)' }}>{profile.displayName}</div>
+            <div style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)' }}>@{profile.username}</div>
           </div>
         </div>
 
@@ -163,6 +163,7 @@ export default function UserProfilePage() {
             textTransform: 'uppercase', color: 'var(--color-primary)',
             marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-2)',
             borderBottom: '1px solid var(--border-color)',
+            textAlign: 'center',
           }}>
             Favorites
           </h2>
@@ -197,7 +198,7 @@ export default function UserProfilePage() {
           </div>
         </div>
 
-        {/* Nav buttons — same layout as ProfilePage */}
+        {/* Nav buttons same layout as ProfilePage */}
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'var(--space-12)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', width: 280 }}>
             <button className="btn btn-ghost" style={btnStyle(activeSection === 'watched')} onClick={() => toggleSection('watched')}>Watched</button>
@@ -234,24 +235,30 @@ export default function UserProfilePage() {
                         const day = date ? date.getDate() : null;
                         return (
                           <Link key={i} to={`/films/${entry.filmId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', padding: 'var(--space-3) var(--space-4)' }}>
-                              <div style={{ minWidth: 36, textAlign: 'center', fontSize: 'var(--font-size-xl)', fontWeight: 700, color: 'var(--text-secondary)', lineHeight: 1 }}>
-                                {day ?? '—'}
+                            <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-4)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                                <div style={{ minWidth: 36, textAlign: 'center', fontSize: 'var(--font-size-xl)', fontWeight: 700, color: 'var(--text-secondary)', lineHeight: 1 }}>
+                                  {day ?? '-'}
+                                </div>
+                                {entry.posterUrl
+                                  ? <img src={entry.posterUrl} alt={entry.title} style={{ width: 36, height: 52, objectFit: 'cover', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
+                                  : <div style={{ width: 36, height: 52, background: 'var(--surface-2)', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
+                                }
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--color-primary)' }}>{entry.title}</div>
+                                  <div style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-xs)' }}>{entry.year}</div>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexShrink: 0 }}>
+                                  {entry.rating > 0 && <span style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)', letterSpacing: 1 }}>{'★'.repeat(entry.rating)}{'☆'.repeat(5 - entry.rating)}</span>}
+                                  {entry.isLiked && <span style={{ color: '#e05c7a', fontSize: 'var(--font-size-sm)' }}>♥</span>}
+                                  {!entry.isFirstWatch && <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '1px 6px' }}>rewatch</span>}
+                                </div>
                               </div>
-                              {entry.posterUrl
-                                ? <img src={entry.posterUrl} alt={entry.title} style={{ width: 36, height: 52, objectFit: 'cover', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
-                                : <div style={{ width: 36, height: 52, background: 'var(--surface-2)', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
-                              }
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{entry.title}</div>
-                                <div style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-xs)' }}>{entry.year}</div>
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexShrink: 0 }}>
-                                {entry.rating > 0 && <span style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)', letterSpacing: 1 }}>{'★'.repeat(entry.rating)}{'☆'.repeat(5 - entry.rating)}</span>}
-                                {entry.isLiked && <span style={{ color: '#e05c7a', fontSize: 'var(--font-size-sm)' }}>♥</span>}
-                                {!entry.isFirstWatch && <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '1px 6px' }}>rewatch</span>}
-                                {entry.content && <span style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)' }}>✎</span>}
-                              </div>
+                              {entry.content && (
+                                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)', lineHeight: 1.6, margin: 0, paddingLeft: 'calc(36px + var(--space-4))', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+                                  {entry.content}
+                                </p>
+                              )}
                             </div>
                           </Link>
                         );

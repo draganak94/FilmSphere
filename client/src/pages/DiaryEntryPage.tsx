@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import api from '../api/axios';
-import NavBar from '../components/NavBar';
+import LogReviewModal from '../components/LogReviewModal';
 
 interface DiaryEntry {
+  reviewId: number;
   filmId: number;
   title: string;
   year: number;
@@ -17,15 +18,17 @@ interface DiaryEntry {
 
 export default function DiaryEntryPage() {
   const { filmId } = useParams<{ filmId: string }>();
-  const navigate = useNavigate();
   const [entry, setEntry] = useState<DiaryEntry | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showEdit, setShowEdit] = useState(false);
 
-  useEffect(() => {
+  const fetchEntry = () => {
     api.get<DiaryEntry>(`/films/${filmId}/my-review`)
       .then(res => setEntry(res.data))
       .finally(() => setLoading(false));
-  }, [filmId]);
+  };
+
+  useEffect(() => { fetchEntry(); }, [filmId]);
 
   if (loading) return <div style={{ padding: 'var(--space-8)', color: 'var(--text-muted)' }}>Loading...</div>;
   if (!entry) return <div style={{ padding: 'var(--space-8)', color: 'var(--color-error)' }}>Entry not found.</div>;
@@ -36,9 +39,12 @@ export default function DiaryEntryPage() {
     : null;
 
   return (
+    <>
     <div style={{ minHeight: '100vh', padding: 'var(--space-8) var(--space-6)' }}>
       <div className="container">
-        <NavBar />
+        <Link to="/diary" className="btn btn-ghost btn-sm" style={{ marginBottom: 'var(--space-6)', display: 'inline-block' }}>
+          ← Back
+        </Link>
 
         <div className="card" style={{ padding: 'var(--space-6)' }}>
           {/* Film header */}
@@ -107,16 +113,53 @@ export default function DiaryEntryPage() {
               lineHeight: 1.75,
               fontSize: 'var(--font-size-sm)',
               whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              marginBottom: 'var(--space-5)',
             }}>
               {entry.content}
             </p>
           ) : (
-            <p style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)', fontStyle: 'italic' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)', fontStyle: 'italic', marginBottom: 'var(--space-5)' }}>
               No written review.
             </p>
           )}
+
+          {/* Edit button */}
+          <button
+            onClick={() => setShowEdit(true)}
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--text-muted)',
+              padding: '4px var(--space-3)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-sm)',
+              transition: 'color var(--transition-fast), border-color var(--transition-fast)',
+            }}
+          >
+            ✎ Edit review
+          </button>
         </div>
       </div>
     </div>
+
+    {showEdit && entry && (
+      <LogReviewModal
+        film={{ id: entry.filmId, title: entry.title, posterUrl: entry.posterUrl }}
+        initialIsLiked={entry.isLiked}
+        editReview={{
+          id: entry.reviewId,
+          rating: entry.rating,
+          content: entry.content,
+          watchedDate: entry.watchedDate,
+          isFirstWatch: entry.isFirstWatch,
+        }}
+        onClose={() => setShowEdit(false)}
+        onSaved={() => {
+          setShowEdit(false);
+          fetchEntry();
+        }}
+      />
+    )}
+    </>
   );
 }

@@ -165,7 +165,7 @@ export default function ChatWidget() {
       da.getDate() === db.getDate();
   };
 
-  // Last message I sent — for Delivered/Seen label
+  // Last message I sent for Delivered/Seen label
   const lastSentIndex = (() => {
     for (let i = activeMessages.length - 1; i >= 0; i--) {
       if (activeMessages[i].senderId === myUserId) return i;
@@ -212,17 +212,17 @@ export default function ChatWidget() {
         {activeFriendId ? (
           <>
             <span style={{ fontSize: 16 }}>←</span>
-            <span style={{ flex: 1 }}>{activeContact?.displayName ?? '...'}</span>
+            <span style={{ flex: 1, color: 'var(--color-primary)' }}>{activeContact?.displayName ?? '...'}</span>
           </>
         ) : (
           <>
-            <span style={{ flex: 1 }}>
+            <span style={{ flex: 1, color: 'var(--color-primary)' }}>
               Messages
               {totalUnread > 0 && (
                 <span style={{
                   marginLeft: 8,
                   background: 'var(--color-primary)',
-                  color: '#fff',
+                  color: '#472552',
                   borderRadius: '999px',
                   padding: '1px 7px',
                   fontSize: 11,
@@ -440,14 +440,14 @@ export default function ChatWidget() {
                   >
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ fontWeight: unread > 0 ? 700 : 400, fontSize: 'var(--font-size-sm)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <span style={{ fontWeight: unread > 0 ? 700 : 400, fontSize: 'var(--font-size-sm)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--color-primary)' }}>
                           {c.displayName}
                         </span>
                         {unread > 0 && (
                           <span style={{
                             flexShrink: 0,
                             background: 'var(--color-primary)',
-                            color: '#fff',
+                            color: '#472552',
                             borderRadius: '999px',
                             padding: '1px 7px',
                             fontSize: 11,

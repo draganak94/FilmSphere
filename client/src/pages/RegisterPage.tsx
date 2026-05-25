@@ -58,7 +58,7 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
           {fields.map(({ name, label, required }) => (
             <div className="form-group" key={name}>
-              <label className="form-label">{label}</label>
+              <label className="form-label" style={{ color: 'var(--color-primary)' }}>{label}</label>
               <input
                 name={name}
                 type={name === 'password' ? 'password' : 'text'}
@@ -72,7 +72,7 @@ export default function RegisterPage() {
 
           {error && <span className="form-error">{error}</span>}
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+          <button type="submit" className="btn btn-primary" style={{ width: '100%', color: '#472552' }}>
             Register
           </button>
         </form>

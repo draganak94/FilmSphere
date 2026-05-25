@@ -87,7 +87,7 @@ function GenreOption({ label, selected, onClick }: { label: string; selected: bo
         borderRadius: 'var(--radius-sm)',
         cursor: 'pointer',
         fontSize: 'var(--font-size-sm)',
-        color: selected ? 'var(--text-inverse)' : hovered ? 'var(--text-inverse)' : 'var(--text-primary)',
+        color: selected ? 'var(--text-inverse)' : hovered ? 'var(--text-inverse)' : 'var(--color-primary)',
         background: selected
           ? 'var(--color-primary)'
           : hovered

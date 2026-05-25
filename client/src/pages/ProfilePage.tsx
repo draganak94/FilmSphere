@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import NavBar from '../components/NavBar';
 import { Film } from '../components/FilmCard';
@@ -19,10 +19,12 @@ interface Profile {
   username: string;
   displayName: string;
   avatarUrl?: string;
+  isVip: boolean;
   favorites: FavoriteFilm[];
 }
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +33,8 @@ export default function ProfilePage() {
   const [pickerSlot, setPickerSlot] = useState<number>(1);
   const [watchedFilms, setWatchedFilms] = useState<Film[]>([]);
   const [pickerSearch, setPickerSearch] = useState('');
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
 
   useEffect(() => {
     api.get<Profile>('/profile')
@@ -38,6 +42,20 @@ export default function ProfilePage() {
       .catch(err => setError(err.response?.data?.message ?? err.message ?? 'Failed to load profile'))
       .finally(() => setLoading(false));
   }, []);
+
+
+  const handleCancelVip = async () => {
+    setCancelLoading(true);
+    setCancelConfirmOpen(false);
+    try {
+      await api.post('/stripe/cancel');
+      setProfile(prev => prev ? { ...prev, isVip: false } : prev);
+    } catch {
+      // silently ignore
+    } finally {
+      setCancelLoading(false);
+    }
+  };
 
   const openPicker = async (slot: number) => {
     setPickerSlot(slot);
@@ -135,7 +153,7 @@ export default function ProfilePage() {
                 width: 100, height: 100, borderRadius: '50%',
                 background: 'var(--color-primary)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 'var(--font-size-xl)', fontWeight: 700, color: '#fff',
+                fontSize: 'var(--font-size-xl)', fontWeight: 700, color: '#472552',
                 border: '3px solid var(--border-color)',
                 opacity: avatarUploading ? 0.5 : 1,
               }}>
@@ -151,8 +169,36 @@ export default function ProfilePage() {
           </label>
 
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontWeight: 700, fontSize: 'var(--font-size-xl)' }}>{profile.displayName}</div>
-            <div style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)' }}>@{profile.username}</div>
+            <div style={{ fontWeight: 700, fontSize: 'var(--font-size-xl)', color: 'var(--color-primary)' }}>
+              {profile.displayName}
+            </div>
+            <div style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)' }}>@{profile.username}</div>
+            {profile.isVip && (
+              <img
+                src="/vip-badge.png"
+                alt="VIP"
+                style={{ width: 70, height: 'auto', margin: 'var(--space-2) auto 0' }}
+              />
+            )}
+            {!profile.isVip && (
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => navigate('/vip')}
+                style={{ marginTop: 'var(--space-3)', background: 'var(--color-primary)', color: '#472552' }}
+              >
+                Upgrade to VIP for $9.99
+              </button>
+            )}
+            {profile.isVip && (
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => setCancelConfirmOpen(true)}
+                disabled={cancelLoading}
+                style={{ marginTop: 'var(--space-3)', background: 'var(--color-primary)', color: '#472552' }}
+              >
+                {cancelLoading ? 'Cancelling...' : 'Cancel VIP membership'}
+              </button>
+            )}
           </div>
         </div>
 
@@ -163,6 +209,7 @@ export default function ProfilePage() {
             textTransform: 'uppercase', color: 'var(--color-primary)',
             marginBottom: 'var(--space-4)', paddingBottom: 'var(--space-2)',
             borderBottom: '1px solid var(--border-color)',
+            textAlign: 'center',
           }}>
             Favorites
           </h2>
@@ -232,6 +279,53 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {cancelConfirmOpen && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 1000, padding: 'var(--space-6)',
+          }}
+          onClick={() => setCancelConfirmOpen(false)}
+        >
+          <div
+            style={{
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--bg-overlay)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--space-8)',
+              maxWidth: 380, width: '100%',
+              display: 'flex', flexDirection: 'column', gap: 'var(--space-6)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div>
+              <h3 style={{ fontWeight: 700, fontSize: 'var(--font-size-lg)', marginBottom: 'var(--space-2)', color: 'var(--color-primary)' }}>
+                Cancel VIP membership?
+              </h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+                Are you sure you want to cancel your VIP membership? You will lose your VIP status immediately.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'flex-end' }}>
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => setCancelConfirmOpen(false)}
+              >
+                Keep VIP
+              </button>
+              <button
+                className="btn btn-sm"
+                onClick={handleCancelVip}
+                style={{ background: 'var(--color-primary)', color: '#472552', fontWeight: 700 }}
+              >
+                Yes, cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Film picker modal */}
       {pickerOpen && (
         <div
@@ -250,7 +344,7 @@ export default function ProfilePage() {
             }}
             onClick={e => e.stopPropagation()}
           >
-            <h3 style={{ fontWeight: 700, margin: 0 }}>Pick a Favorite</h3>
+            <h3 style={{ fontWeight: 700, margin: 0, color: 'var(--color-primary)' }}>Pick a Favorite</h3>
             <input
               type="text"
               placeholder="Search watched films..."
@@ -288,7 +382,7 @@ export default function ProfilePage() {
                     )}
                     <div style={{
                       fontSize: 'var(--font-size-xs)', marginTop: 4,
-                      color: 'var(--text-secondary)', overflow: 'hidden',
+                      color: 'var(--color-primary)', overflow: 'hidden',
                       textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     }}>
                       {f.title}

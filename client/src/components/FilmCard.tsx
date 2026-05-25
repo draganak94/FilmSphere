@@ -46,7 +46,7 @@ export default function FilmCard({ film }: { film: Film }) {
         )}
       </div>
       <div style={{ padding: 'var(--space-3)' }}>
-        <div style={{ fontWeight: 700, fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>
+        <div style={{ fontWeight: 700, fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)', color: 'var(--color-primary)' }}>
           {film.title}
         </div>
         <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-xs)' }}>

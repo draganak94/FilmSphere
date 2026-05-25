@@ -100,7 +100,7 @@ export default function DiaryPage() {
                             color: 'var(--text-secondary)',
                             lineHeight: 1,
                           }}>
-                            {day ?? '—'}
+                            {day ?? '-'}
                           </div>
 
                           {/* Poster */}
@@ -116,7 +116,7 @@ export default function DiaryPage() {
 
                           {/* Title + year */}
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--color-primary)' }}>
                               {entry.title}
                             </div>
                             <div style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-xs)' }}>

@@ -11,6 +11,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('');
+  const [isVip, setIsVip] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -18,6 +19,9 @@ export default function HomePage() {
     api.get<Film[]>('/films')
       .then(res => setFilms(res.data))
       .finally(() => setLoading(false));
+    api.get<{ isVip: boolean }>('/profile')
+      .then(res => setIsVip(res.data.isVip))
+      .catch(() => {});
   }, [user]);
 
   const genres = useMemo(() => {
@@ -61,9 +65,14 @@ export default function HomePage() {
     <div style={{ minHeight: '100vh', padding: 'var(--space-8) var(--space-6)' }}>
       <div className="container">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-8)' }}>
-          <h1 className="gradient-text" style={{ fontSize: 'var(--font-size-2xl)' }}>
-            Welcome, {user.displayName}!
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            {isVip && (
+              <img src="/vip-badge.png" alt="VIP" style={{ width: 65, height: 'auto', marginBottom: '4px' }} />
+            )}
+            <h1 className="gradient-text" style={{ fontSize: 'var(--font-size-2xl)' }}>
+              Welcome, {user.displayName}!
+            </h1>
+          </div>
           <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
             <Link to="/watched" className="btn btn-ghost btn-sm">Watched</Link>
             <Link to="/diary" className="btn btn-ghost btn-sm">Diary</Link>

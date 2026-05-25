@@ -13,6 +13,7 @@ import DiaryPage from './pages/DiaryPage';
 import DiaryEntryPage from './pages/DiaryEntryPage';
 import ProfilePage from './pages/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage';
+import VipPage from './pages/VipPage';
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/watchlist" element={<WatchlistPage />} />
           <Route path="/friends" element={<FriendsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/vip" element={<VipPage />} />
           <Route path="/users/:username" element={<UserProfilePage />} />
         </Route>
       </Routes>

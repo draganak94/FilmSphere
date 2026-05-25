@@ -56,7 +56,7 @@ builder.Services.AddAuthorization();
 // SignalR
 builder.Services.AddSignalR();
 
-// CORS — AllowCredentials required for SignalR
+// CORS AllowCredentials required for SignalR
 builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(p =>
         p.WithOrigins("http://localhost:5173")

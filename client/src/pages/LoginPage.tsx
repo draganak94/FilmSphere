@@ -41,7 +41,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
           <div className="form-group">
-            <label className="form-label">Username</label>
+            <label className="form-label" style={{ color: 'var(--color-primary)' }}>Username</label>
             <input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -51,7 +51,7 @@ export default function LoginPage() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Password</label>
+            <label className="form-label" style={{ color: 'var(--color-primary)' }}>Password</label>
             <input
               type="password"
               value={password}
@@ -63,7 +63,7 @@ export default function LoginPage() {
 
           {error && <span className="form-error">{error}</span>}
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+          <button type="submit" className="btn btn-primary" style={{ width: '100%', color: '#472552' }}>
             Sign in
           </button>
         </form>

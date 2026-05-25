@@ -43,6 +43,7 @@ public class ProfileController(AppDbContext db) : ControllerBase
             Username = user.Username,
             DisplayName = user.DisplayName,
             AvatarUrl = user.AvatarUrl,
+            IsVip = user.IsSubscribed,
             Favorites = favorites
         });
     }

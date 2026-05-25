@@ -156,7 +156,7 @@ export default function FilmPage() {
 
         {/* Trailer */}
         {embedUrl && (
-          <div style={{ marginBottom: 'var(--space-8)' }}>
+          <div style={{ marginBottom: 'var(--space-4)' }}>
             <h2 style={{ fontSize: 'var(--font-size-xl)', marginBottom: 'var(--space-4)', color: 'var(--color-primary)' }}>Trailer</h2>
             <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
               <iframe
@@ -166,38 +166,38 @@ export default function FilmPage() {
                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
               />
             </div>
-
-            {/* Watch full movie */}
-            <div style={{ marginTop: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => {
-                  if (film.isVip) {
-                    navigate(`/watch/${film.id}`);
-                  } else {
-                    setShowVipNotice(v => !v);
-                  }
-                }}
-                style={{ color: '#472552' }}
-              >
-                ▶ Watch full movie
-              </button>
-              {showVipNotice && !film.isVip && (
-                <span style={{
-                  color: 'var(--text-secondary)',
-                  fontSize: 'var(--font-size-sm)',
-                  background: 'var(--bg-elevated)',
-                  border: '1px solid var(--bg-overlay)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: 'var(--space-2) var(--space-3)',
-                }}>
-                  You have to upgrade your account to VIP to watch the full movie.{' '}
-                  <Link to="/vip" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>Upgrade now →</Link>
-                </span>
-              )}
-            </div>
           </div>
         )}
+
+        {/* Watch full movie */}
+        <div style={{ marginBottom: 'var(--space-8)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={() => {
+              if (film.isVip) {
+                navigate(`/watch/${film.id}`);
+              } else {
+                setShowVipNotice(v => !v);
+              }
+            }}
+            style={{ color: '#472552' }}
+          >
+            ▶ Watch full movie
+          </button>
+          {showVipNotice && !film.isVip && (
+            <span style={{
+              color: 'var(--text-secondary)',
+              fontSize: 'var(--font-size-sm)',
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--bg-overlay)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-2) var(--space-3)',
+            }}>
+              You have to upgrade your account to VIP to watch the full movie.{' '}
+              <Link to="/vip" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>Upgrade now →</Link>
+            </span>
+          )}
+        </div>
 
         {/* Reviews */}
         <div>

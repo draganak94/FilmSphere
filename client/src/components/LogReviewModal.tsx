@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api from '../api/axios';
+import DatePickerInput from './DatePickerInput';
 
 interface Props {
   film: { id: number; title: string; posterUrl?: string };
@@ -117,12 +118,10 @@ export default function LogReviewModal({ film, initialIsLiked, onClose, onSaved,
           <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
             Date watched
           </label>
-          <input
-            type="date"
+          <DatePickerInput
             value={watchedDate}
             max={today}
-            onChange={e => setWatchedDate(e.target.value)}
-            style={{ width: '100%' }}
+            onChange={setWatchedDate}
           />
         </div>
 

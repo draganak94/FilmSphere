@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import api from '../api/axios';
 import LogReviewModal from '../components/LogReviewModal';
 
@@ -31,6 +31,8 @@ interface FilmDetail {
   inWatchlist: boolean;
   isLiked: boolean;
   isWatched: boolean;
+  isVip: boolean;
+  hasFullMovie: boolean;
   reviews: Review[];
 }
 
@@ -47,6 +49,7 @@ export default function FilmPage() {
   const [loading, setLoading] = useState(true);
   const [showLogModal, setShowLogModal] = useState(false);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
+  const [showVipNotice, setShowVipNotice] = useState(false);
 
   useEffect(() => {
     api.get<FilmDetail>(`/films/${id}`)
@@ -162,6 +165,36 @@ export default function FilmPage() {
                 allowFullScreen
                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
               />
+            </div>
+
+            {/* Watch full movie */}
+            <div style={{ marginTop: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => {
+                  if (film.isVip) {
+                    navigate(`/watch/${film.id}`);
+                  } else {
+                    setShowVipNotice(v => !v);
+                  }
+                }}
+                style={{ color: '#472552' }}
+              >
+                ▶ Watch full movie
+              </button>
+              {showVipNotice && !film.isVip && (
+                <span style={{
+                  color: 'var(--text-secondary)',
+                  fontSize: 'var(--font-size-sm)',
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--bg-overlay)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: 'var(--space-2) var(--space-3)',
+                }}>
+                  You have to upgrade your account to VIP to watch the full movie.{' '}
+                  <Link to="/vip" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>Upgrade now →</Link>
+                </span>
+              )}
             </div>
           </div>
         )}

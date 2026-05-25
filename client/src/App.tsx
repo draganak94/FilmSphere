@@ -14,6 +14,7 @@ import DiaryEntryPage from './pages/DiaryEntryPage';
 import ProfilePage from './pages/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage';
 import VipPage from './pages/VipPage';
+import WatchPage from './pages/WatchPage';
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/friends" element={<FriendsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/vip" element={<VipPage />} />
+          <Route path="/watch/:id" element={<WatchPage />} />
           <Route path="/users/:username" element={<UserProfilePage />} />
         </Route>
       </Routes>

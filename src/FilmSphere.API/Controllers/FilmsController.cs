@@ -6,13 +6,14 @@ using FilmSphere.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 
 namespace FilmSphere.API.Controllers;
 
 [ApiController]
 [Route("api/films")]
 [Authorize]
-public class FilmsController(AppDbContext db) : ControllerBase
+public class FilmsController(AppDbContext db, IWebHostEnvironment env) : ControllerBase
 {
     private Guid UserId => Guid.Parse(
         User.FindFirstValue(ClaimTypes.NameIdentifier)
@@ -46,6 +47,10 @@ public class FilmsController(AppDbContext db) : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var userId = UserId;
+        var isVip = await db.Users
+            .Where(u => u.Id == userId)
+            .Select(u => u.IsSubscribed)
+            .FirstOrDefaultAsync();
 
         var film = await db.Films
             .Where(f => f.Id == id)
@@ -65,6 +70,8 @@ public class FilmsController(AppDbContext db) : ControllerBase
                 InWatchlist = db.WatchlistItems.Any(w => w.FilmId == id && w.UserId == userId),
                 IsLiked = db.FilmLikes.Any(l => l.FilmId == id && l.UserId == userId),
                 IsWatched = db.Reviews.Any(r => r.FilmId == id && r.UserId == userId),
+                IsVip = isVip,
+                HasFullMovie = true,
                 Reviews = f.Reviews
                     .OrderByDescending(r => r.CreatedAt)
                     .Select(r => new ReviewDto
@@ -85,6 +92,31 @@ public class FilmsController(AppDbContext db) : ControllerBase
 
         if (film is null) return NotFound();
         return Ok(film);
+    }
+
+    [HttpGet("stream")]
+    public async Task<IActionResult> StreamFilm([FromQuery(Name = "movie_id")] int movieId)
+    {
+        var userId = UserId;
+        var user = await db.Users.FindAsync(userId);
+
+        if (user is null || !user.IsSubscribed)
+            return StatusCode(403, "VIP subscription required to watch full movies.");
+
+        var film = await db.Films.FindAsync(movieId);
+        if (film is null)
+            return NotFound("Film not found.");
+
+        // If a per-film video file is configured and exists, stream it.
+        if (!string.IsNullOrEmpty(film.VideoUrl) && System.IO.File.Exists(film.VideoUrl))
+            return PhysicalFile(film.VideoUrl, "video/mp4", enableRangeProcessing: true);
+
+        // Demo fallback: serve orgulje.mp4 from wwwroot for every film.
+        var fallbackPath = Path.Combine(env.WebRootPath, "kisa.mp4");
+        if (!System.IO.File.Exists(fallbackPath))
+            return NotFound("Demo video file not found on server.");
+
+        return PhysicalFile(fallbackPath, "video/mp4", enableRangeProcessing: true);
     }
 
     [HttpPost("{id}/reviews")]

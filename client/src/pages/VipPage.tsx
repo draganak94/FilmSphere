@@ -145,7 +145,6 @@ export default function VipPage() {
         }}>
           <div className="card" style={{ width: '100%', maxWidth: 460 }}>
 
-            {/* Header */}
             <div style={{ marginBottom: 'var(--space-8)' }}>
               <h2 style={{
                 fontSize: 'var(--font-size-2xl)', fontWeight: 700,
@@ -158,7 +157,6 @@ export default function VipPage() {
               </p>
             </div>
 
-            {/* Divider */}
             <div style={{
               borderTop: '1px solid var(--bg-overlay)',
               marginBottom: 'var(--space-8)',
@@ -180,7 +178,6 @@ export default function VipPage() {
               </p>
             )}
 
-            {/* Back link */}
             <div style={{ marginTop: 'var(--space-6)', textAlign: 'center' }}>
               <Link
                 to="/profile"

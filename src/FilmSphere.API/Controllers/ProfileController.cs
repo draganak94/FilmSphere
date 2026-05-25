@@ -194,7 +194,6 @@ public class ProfileController(AppDbContext db) : ControllerBase
         var avatarsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "avatars");
         Directory.CreateDirectory(avatarsDir);
 
-        // Remove old avatar file if it was previously uploaded
         var user = await db.Users.FindAsync(userId);
         if (user?.AvatarUrl?.StartsWith("/avatars/") == true)
         {

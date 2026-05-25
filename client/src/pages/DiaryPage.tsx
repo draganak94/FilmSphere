@@ -91,7 +91,6 @@ export default function DiaryPage() {
                             transition: 'background var(--transition-fast)',
                           }}
                         >
-                          {/* Day number */}
                           <div style={{
                             minWidth: 36,
                             textAlign: 'center',
@@ -103,7 +102,6 @@ export default function DiaryPage() {
                             {day ?? '-'}
                           </div>
 
-                          {/* Poster */}
                           {entry.posterUrl ? (
                             <img
                               src={entry.posterUrl}
@@ -114,7 +112,6 @@ export default function DiaryPage() {
                             <div style={{ width: 36, height: 52, background: 'var(--surface-2)', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
                           )}
 
-                          {/* Title + year */}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--color-primary)' }}>
                               {entry.title}
@@ -124,7 +121,6 @@ export default function DiaryPage() {
                             </div>
                           </div>
 
-                          {/* Review data */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexShrink: 0 }}>
                             {entry.rating > 0 && (
                               <span style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)', letterSpacing: 1 }}>

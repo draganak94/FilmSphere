@@ -1,6 +1,3 @@
-/* ============================================================
-   CSS VARIABLES
-   ============================================================ */
 :root {
   --color-primary: #a5d2b5;
   --color-primary-dark: #7eb898;
@@ -58,9 +55,6 @@
   --navbar-height: 64px;
 }
 
-/* ============================================================
-   RESET & BASE
-   ============================================================ */
 *,
 *::before,
 *::after {
@@ -127,7 +121,6 @@ button {
   cursor: pointer;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -145,9 +138,6 @@ button {
   background: var(--color-primary);
 }
 
-/* ============================================================
-   BUTTONS
-   ============================================================ */
 .btn {
   box-sizing: border-box;
   display: inline-flex;
@@ -215,9 +205,6 @@ button {
   font-size: var(--font-size-lg);
 }
 
-/* ============================================================
-   CARDS
-   ============================================================ */
 .card {
   background: var(--bg-surface);
   border: 1px solid var(--bg-overlay);
@@ -242,9 +229,6 @@ button {
   border-color: var(--color-primary);
 }
 
-/* ============================================================
-   LAYOUT
-   ============================================================ */
 .container {
   max-width: var(--max-width);
   margin-inline: auto;
@@ -255,9 +239,6 @@ button {
   min-height: calc(100vh - var(--navbar-height));
 }
 
-/* ============================================================
-   TEXT UTILITIES
-   ============================================================ */
 .text-muted {
   color: var(--text-muted);
   font-size: var(--font-size-sm);
@@ -267,9 +248,6 @@ button {
   color: var(--color-primary);
 }
 
-/* ============================================================
-   FORMS
-   ============================================================ */
 .form-group {
   display: flex;
   flex-direction: column;

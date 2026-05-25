@@ -16,6 +16,7 @@ public class FilmDetailDto
     public bool InWatchlist { get; set; }
     public bool IsLiked { get; set; }
     public bool IsWatched { get; set; }
+    public int? MyReviewId { get; set; }
     public bool IsVip { get; set; }
     public bool HasFullMovie { get; set; }
     public List<ReviewDto> Reviews { get; set; } = [];

@@ -131,7 +131,6 @@ export default function UserProfilePage() {
       <div className="container">
         <NavBar />
 
-        {/* Avatar + name */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-8)' }}>
           {profile.avatarUrl ? (
             <img
@@ -156,7 +155,6 @@ export default function UserProfilePage() {
           </div>
         </div>
 
-        {/* Favorites */}
         <div style={{ marginBottom: 'var(--space-8)' }}>
           <h2 style={{
             fontSize: 'var(--font-size-sm)', fontWeight: 700, letterSpacing: '0.1em',
@@ -198,7 +196,6 @@ export default function UserProfilePage() {
           </div>
         </div>
 
-        {/* Nav buttons same layout as ProfilePage */}
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'var(--space-12)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', width: 280 }}>
             <button className="btn btn-ghost" style={btnStyle(activeSection === 'watched')} onClick={() => toggleSection('watched')}>Watched</button>
@@ -208,7 +205,6 @@ export default function UserProfilePage() {
           </div>
         </div>
 
-        {/* Section content */}
         {sectionLoading && <p style={{ color: 'var(--text-muted)', textAlign: 'center', marginTop: 'var(--space-6)' }}>Loading...</p>}
 
         {!sectionLoading && activeSection === 'watched' && watched && filmGrid(watched)}

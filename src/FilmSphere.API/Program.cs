@@ -11,17 +11,14 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Database
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
        .UseSnakeCaseNamingConvention());
 
-// Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFriendService, FriendService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 
-// JWT authentication
 var jwt = builder.Configuration.GetSection("Jwt");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
@@ -37,7 +34,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwt["Key"]!))
         };
-        // SignalR sends token via query string (WebSockets can't set headers)
         opt.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
@@ -54,10 +50,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// SignalR
 builder.Services.AddSignalR();
 
-// CORS AllowCredentials required for SignalR
 builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(p =>
         p.WithOrigins("http://localhost:5173")
@@ -65,7 +59,6 @@ builder.Services.AddCors(opt =>
          .AllowAnyMethod()
          .AllowCredentials()));
 
-// Controllers + Swagger
 builder.Services.AddControllers()
     .AddJsonOptions(opt =>
         opt.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));

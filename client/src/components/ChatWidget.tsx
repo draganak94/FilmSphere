@@ -39,13 +39,11 @@ export default function ChatWidget() {
   const totalUnread = Object.values(unreadCounts).reduce((a, b) => a + b, 0);
   const activeMessages: ChatMessage[] = activeFriendId ? (conversations[activeFriendId] ?? []) : [];
 
-  // Reset everything when user changes (logout / switch account)
   useEffect(() => {
     reset();
     setContacts([]);
   }, [user?.userId]);
 
-  // Poll contacts every 10s while widget is open
   useEffect(() => {
     if (!user || !widgetOpen) return;
     const fetch = () =>
@@ -55,7 +53,6 @@ export default function ChatWidget() {
     return () => clearInterval(id);
   }, [widgetOpen, user?.userId]);
 
-  // Poll unread counts every 5s
   useEffect(() => {
     if (!user) return;
     const fetch = () =>
@@ -67,13 +64,11 @@ export default function ChatWidget() {
     return () => clearInterval(id);
   }, [user?.userId]);
 
-  // Refresh contacts immediately when opening a conversation (updates isFriend status)
   useEffect(() => {
     if (!user || !activeFriendId) return;
     api.get<Contact[]>('/messages/contacts').then(res => setContacts(res.data)).catch(() => {});
   }, [activeFriendId, user?.userId]);
 
-  // Poll active conversation every 2s
   useEffect(() => {
     if (!activeFriendId) return;
 
@@ -84,7 +79,6 @@ export default function ChatWidget() {
       api.get<ChatMessage[]>(`/messages/${activeFriendId}`)
         .then(res => {
           setMessages(activeFriendId, res.data);
-          // Mark seen whenever new messages arrive
           api.post(`/messages/${activeFriendId}/seen`).catch(() => {});
         })
         .catch(() => {});
@@ -94,7 +88,6 @@ export default function ChatWidget() {
     return () => clearInterval(id);
   }, [activeFriendId]);
 
-  // Close emoji picker on outside click
   useEffect(() => {
     if (!emojiOpen) return;
     const handler = (e: MouseEvent) => {
@@ -106,7 +99,6 @@ export default function ChatWidget() {
     return () => document.removeEventListener('mousedown', handler);
   }, [emojiOpen]);
 
-  // Scroll to bottom only when message count increases
   useEffect(() => {
     if (activeMessages.length > prevMessageCount.current) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -165,7 +157,6 @@ export default function ChatWidget() {
       da.getDate() === db.getDate();
   };
 
-  // Last message I sent for Delivered/Seen label
   const lastSentIndex = (() => {
     for (let i = activeMessages.length - 1; i >= 0; i--) {
       if (activeMessages[i].senderId === myUserId) return i;
@@ -192,7 +183,6 @@ export default function ChatWidget() {
       border: '1px solid var(--bg-overlay)',
       borderBottom: 'none',
     }}>
-      {/* Header */}
       <button
         onClick={activeFriendId ? closeChat : toggleWidget}
         style={{
@@ -239,7 +229,6 @@ export default function ChatWidget() {
       {widgetOpen && (
         activeFriendId ? (
           <>
-            {/* Messages */}
             <div style={{
               height: 340,
               overflowY: 'auto',
@@ -302,7 +291,6 @@ export default function ChatWidget() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input */}
             {activeContact?.isFriend ? (
               <div ref={emojiRef} style={{
                 position: 'relative',
@@ -406,7 +394,6 @@ export default function ChatWidget() {
             )}
           </>
         ) : (
-          /* Friend list */
           <div style={{ maxHeight: 320, overflowY: 'auto', overflowX: 'hidden' }}>
             {contacts.length === 0 ? (
               <p style={{

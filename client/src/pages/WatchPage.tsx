@@ -57,8 +57,6 @@ export default function WatchPage() {
     );
   }
 
-  // Stream URL includes the JWT token as a query param because <video> cannot
-  // send Authorization headers. The backend accepts it via OnMessageReceived.
   const streamUrl = `${api.defaults.baseURL}/films/stream?movie_id=${id}&access_token=${token}`;
 
   return (

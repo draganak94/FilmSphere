@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 
 interface Props {
-  value: string;   // YYYY-MM-DD
-  max?: string;    // YYYY-MM-DD
+  value: string;
+  max?: string;
   onChange: (value: string) => void;
 }
 
@@ -40,7 +40,6 @@ function firstWeekday(year: number, month: number) {
   return new Date(year, month - 1, 1).getDay();
 }
 
-// shared styles
 const navBtn = (disabled = false): React.CSSProperties => ({
   color: disabled ? 'var(--text-muted)' : 'var(--color-primary)',
   fontSize: 16,
@@ -58,7 +57,6 @@ export default function DatePickerInput({ value, max, onChange }: Props) {
   const [calView, setCalView] = useState<CalView>('days');
   const [viewYear, setViewYear] = useState(initial.year);
   const [viewMonth, setViewMonth] = useState(initial.month);
-  // first year shown in year-grid page
   const [yearPageStart, setYearPageStart] = useState(() => Math.floor(initial.year / YEAR_PAGE) * YEAR_PAGE);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -75,7 +73,6 @@ export default function DatePickerInput({ value, max, onChange }: Props) {
 
   const maxP = max ? parseDate(max) : null;
 
-  // ── days helpers ──────────────────────────────────────────────
   const prevMonth = () => {
     if (viewMonth === 1) { setViewMonth(12); setViewYear(y => y - 1); }
     else setViewMonth(m => m - 1);
@@ -105,7 +102,6 @@ export default function DatePickerInput({ value, max, onChange }: Props) {
   const selected = value ? parseDate(value) : null;
   const todayP = parseDate(today);
 
-  // ── months helpers ────────────────────────────────────────────
   const canNextYear = !maxP || viewYear < maxP.year;
   const selectMonth = (m: number) => {
     setViewMonth(m);
@@ -114,7 +110,6 @@ export default function DatePickerInput({ value, max, onChange }: Props) {
   const isMonthDisabled = (m: number) =>
     !!maxP && (viewYear > maxP.year || (viewYear === maxP.year && m > maxP.month));
 
-  // ── years helpers ─────────────────────────────────────────────
   const years = Array.from({ length: YEAR_PAGE }, (_, i) => yearPageStart + i);
   const canNextYearPage = !maxP || yearPageStart + YEAR_PAGE <= maxP.year;
   const selectYear = (y: number) => {
@@ -138,7 +133,6 @@ export default function DatePickerInput({ value, max, onChange }: Props) {
 
   return (
     <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
-      {/* Trigger */}
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
@@ -165,7 +159,6 @@ export default function DatePickerInput({ value, max, onChange }: Props) {
         <span style={{ color: 'var(--color-primary)', fontSize: 16 }}>▾</span>
       </button>
 
-      {/* Calendar popup */}
       {open && (
         <div
           style={{
@@ -182,7 +175,6 @@ export default function DatePickerInput({ value, max, onChange }: Props) {
             userSelect: 'none',
           }}
         >
-          {/* ── DAYS VIEW ── */}
           {calView === 'days' && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
@@ -242,7 +234,6 @@ export default function DatePickerInput({ value, max, onChange }: Props) {
             </>
           )}
 
-          {/* ── MONTHS VIEW ── */}
           {calView === 'months' && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -292,7 +283,6 @@ export default function DatePickerInput({ value, max, onChange }: Props) {
             </>
           )}
 
-          {/* ── YEARS VIEW ── */}
           {calView === 'years' && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>

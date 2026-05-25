@@ -47,7 +47,6 @@ export default function DiaryEntryPage() {
         </Link>
 
         <div className="card" style={{ padding: 'var(--space-6)' }}>
-          {/* Film header */}
           <div style={{ display: 'flex', gap: 'var(--space-8)', marginBottom: 'var(--space-6)' }}>
             {entry.posterUrl && (
               <Link to={`/films/${entry.filmId}`} style={{ flexShrink: 0 }}>
@@ -80,7 +79,6 @@ export default function DiaryEntryPage() {
             </div>
           </div>
 
-          {/* Metadata row */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)', marginBottom: 'var(--space-5)', alignItems: 'center' }}>
             {formattedDate && (
               <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
@@ -106,7 +104,6 @@ export default function DiaryEntryPage() {
             </span>
           </div>
 
-          {/* Review text */}
           {entry.content ? (
             <p style={{
               color: 'var(--text-secondary)',
@@ -124,7 +121,6 @@ export default function DiaryEntryPage() {
             </p>
           )}
 
-          {/* Edit button */}
           <button
             onClick={() => setShowEdit(true)}
             style={{

@@ -88,7 +88,6 @@ export default function LogReviewModal({ film, initialIsLiked, onClose, onSaved,
           maxHeight: '90vh', overflowY: 'auto',
         }}
       >
-        {/* Header: poster + title */}
         <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center' }}>
           {film.posterUrl && (
             <img
@@ -113,7 +112,6 @@ export default function LogReviewModal({ film, initialIsLiked, onClose, onSaved,
           </button>
         </div>
 
-        {/* Date */}
         <div>
           <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
             Date watched
@@ -125,7 +123,6 @@ export default function LogReviewModal({ film, initialIsLiked, onClose, onSaved,
           />
         </div>
 
-        {/* Stars + Like */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
           <div style={{ display: 'flex', gap: 'var(--space-1)' }}>
             {[1, 2, 3, 4, 5].map(n => (
@@ -165,7 +162,6 @@ export default function LogReviewModal({ film, initialIsLiked, onClose, onSaved,
           </p>
         )}
 
-        {/* Review text */}
         <textarea
           rows={4}
           placeholder="Add review..."
@@ -174,7 +170,6 @@ export default function LogReviewModal({ film, initialIsLiked, onClose, onSaved,
           style={{ resize: 'vertical' }}
         />
 
-        {/* First-time toggle */}
         <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-3)' }}>
           <button
             onClick={() => setIsFirstWatch(true)}
@@ -194,7 +189,6 @@ export default function LogReviewModal({ film, initialIsLiked, onClose, onSaved,
           <p style={{ color: 'var(--color-error)', fontSize: 'var(--font-size-sm)' }}>{error}</p>
         )}
 
-        {/* Actions */}
         <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'flex-end', marginTop: 'var(--space-3)' }}>
           <button className="btn btn-ghost btn-sm" onClick={onClose}>Cancel</button>
           <button

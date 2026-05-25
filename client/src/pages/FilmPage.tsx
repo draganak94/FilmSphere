@@ -33,6 +33,7 @@ interface FilmDetail {
   isWatched: boolean;
   isVip: boolean;
   hasFullMovie: boolean;
+  myReviewId?: number;
   reviews: Review[];
 }
 
@@ -50,6 +51,7 @@ export default function FilmPage() {
   const [showLogModal, setShowLogModal] = useState(false);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [showVipNotice, setShowVipNotice] = useState(false);
+  const [showUnwatchConfirm, setShowUnwatchConfirm] = useState(false);
 
   useEffect(() => {
     api.get<FilmDetail>(`/films/${id}`)
@@ -92,7 +94,6 @@ export default function FilmPage() {
           ← Back
         </button>
 
-        {/* Header */}
         <div style={{ display: 'flex', gap: 'var(--space-8)', marginBottom: 'var(--space-8)', flexWrap: 'wrap' }}>
           {film.posterUrl && (
             <img src={film.posterUrl} alt={film.title} style={{ width: 200, borderRadius: 'var(--radius-lg)', flexShrink: 0 }} />
@@ -142,19 +143,26 @@ export default function FilmPage() {
                   Review or log
                 </button>
               ) : (
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
-                  fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)',
-                  padding: '0 var(--space-2)',
-                }}>
-                  ✓ Watched
-                </span>
+                <>
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
+                    fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)',
+                    padding: '0 var(--space-2)',
+                  }}>
+                    ✓ Watched
+                  </span>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setShowUnwatchConfirm(true)}
+                  >
+                    Remove from watched
+                  </button>
+                </>
               )}
             </div>
           </div>
         </div>
 
-        {/* Trailer */}
         {embedUrl && (
           <div style={{ marginBottom: 'var(--space-4)' }}>
             <h2 style={{ fontSize: 'var(--font-size-xl)', marginBottom: 'var(--space-4)', color: 'var(--color-primary)' }}>Trailer</h2>
@@ -169,7 +177,6 @@ export default function FilmPage() {
           </div>
         )}
 
-        {/* Watch full movie */}
         <div style={{ marginBottom: 'var(--space-8)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
           <button
             className="btn btn-primary btn-sm"
@@ -199,7 +206,6 @@ export default function FilmPage() {
           )}
         </div>
 
-        {/* Reviews */}
         <div>
           <h2 style={{ fontSize: 'var(--font-size-xl)', marginBottom: 'var(--space-6)', color: 'var(--color-primary)' }}>
             Reviews {film.reviews.length > 0 && <span style={{ color: 'var(--color-primary)', fontWeight: 400 }}>({film.reviews.length})</span>}
@@ -299,6 +305,58 @@ export default function FilmPage() {
           await refreshFilm();
         }}
       />
+    )}
+
+    {showUnwatchConfirm && film && (
+      <div
+        style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000, padding: 'var(--space-6)',
+        }}
+        onClick={() => setShowUnwatchConfirm(false)}
+      >
+        <div
+          style={{
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--bg-overlay)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-8)',
+            maxWidth: 380, width: '100%',
+            display: 'flex', flexDirection: 'column', gap: 'var(--space-6)',
+          }}
+          onClick={e => e.stopPropagation()}
+        >
+          <div>
+            <h3 style={{ fontWeight: 700, fontSize: 'var(--font-size-lg)', marginBottom: 'var(--space-2)', color: 'var(--color-primary)' }}>
+              Remove from watched?
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+              This will delete your review and log for <strong style={{ color: 'var(--text-primary)' }}>{film.title}</strong>. This action cannot be undone.
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'flex-end' }}>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => setShowUnwatchConfirm(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn btn-sm"
+              onClick={async () => {
+                if (!film.myReviewId) return;
+                await api.delete(`/films/reviews/${film.myReviewId}`);
+                setShowUnwatchConfirm(false);
+                await refreshFilm();
+              }}
+              style={{ background: 'var(--color-primary)', color: '#472552', fontWeight: 700 }}
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
     )}
     </>
   );

@@ -70,6 +70,7 @@ public class FilmsController(AppDbContext db, IWebHostEnvironment env) : Control
                 InWatchlist = db.WatchlistItems.Any(w => w.FilmId == id && w.UserId == userId),
                 IsLiked = db.FilmLikes.Any(l => l.FilmId == id && l.UserId == userId),
                 IsWatched = db.Reviews.Any(r => r.FilmId == id && r.UserId == userId),
+                MyReviewId = db.Reviews.Where(r => r.FilmId == id && r.UserId == userId).Select(r => (int?)r.Id).FirstOrDefault(),
                 IsVip = isVip,
                 HasFullMovie = true,
                 Reviews = f.Reviews
@@ -107,11 +108,9 @@ public class FilmsController(AppDbContext db, IWebHostEnvironment env) : Control
         if (film is null)
             return NotFound("Film not found.");
 
-        // If a per-film video file is configured and exists, stream it.
         if (!string.IsNullOrEmpty(film.VideoUrl) && System.IO.File.Exists(film.VideoUrl))
             return PhysicalFile(film.VideoUrl, "video/mp4", enableRangeProcessing: true);
 
-        // Demo fallback: serve orgulje.mp4 from wwwroot for every film.
         var fallbackPath = Path.Combine(env.WebRootPath, "kisa.mp4");
         if (!System.IO.File.Exists(fallbackPath))
             return NotFound("Demo video file not found on server.");
@@ -170,6 +169,34 @@ public class FilmsController(AppDbContext db, IWebHostEnvironment env) : Control
         await UpdateAverageRating(review.FilmId);
 
         return Ok(new { review.Id });
+    }
+
+    [HttpDelete("reviews/{reviewId}")]
+    public async Task<IActionResult> DeleteReview(int reviewId)
+    {
+        var userId = UserId;
+
+        var review = await db.Reviews.FindAsync(reviewId);
+        if (review is null) return NotFound();
+        if (review.UserId != userId) return Forbid();
+
+        var filmId = review.FilmId;
+
+        await db.ReviewLikes
+            .Where(l => l.ReviewId == reviewId)
+            .ExecuteDeleteAsync();
+
+        db.Reviews.Remove(review);
+        await db.SaveChangesAsync();
+
+        var hasRemaining = await db.Reviews.AnyAsync(r => r.FilmId == filmId);
+        if (hasRemaining)
+            await UpdateAverageRating(filmId);
+        else
+            await db.Films.Where(f => f.Id == filmId)
+                .ExecuteUpdateAsync(s => s.SetProperty(f => f.AverageRating, 0m));
+
+        return Ok();
     }
 
     [HttpPost("reviews/{reviewId}/like")]

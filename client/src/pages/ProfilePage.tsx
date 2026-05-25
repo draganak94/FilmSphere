@@ -51,7 +51,6 @@ export default function ProfilePage() {
       await api.post('/stripe/cancel');
       setProfile(prev => prev ? { ...prev, isVip: false } : prev);
     } catch {
-      // silently ignore
     } finally {
       setCancelLoading(false);
     }
@@ -128,7 +127,6 @@ export default function ProfilePage() {
       <div className="container">
         <NavBar />
 
-        {/* Avatar + name */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-8)' }}>
           <label style={{ position: 'relative', cursor: avatarUploading ? 'wait' : 'pointer' }}>
             <input
@@ -202,7 +200,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Favorites */}
         <div style={{ marginBottom: 'var(--space-8)' }}>
           <h2 style={{
             fontSize: 'var(--font-size-sm)', fontWeight: 700, letterSpacing: '0.1em',
@@ -267,7 +264,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Vertical nav */}
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'var(--space-12)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', width: 280 }}>
             <Link to="/watched" className="btn btn-ghost" style={{ textAlign: 'center' }}>Watched</Link>
@@ -326,7 +322,6 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Film picker modal */}
       {pickerOpen && (
         <div
           style={{
